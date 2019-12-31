@@ -1,4 +1,4 @@
-pragma solidity ^0.5.10;
+pragma solidity ^0.5.8;
 
 import './Actor.sol';
 import '../token/ERC20Basic.sol';
@@ -38,6 +38,12 @@ contract Marketplace is Actor, Pausable {
         usersToAddress[index] = _actorAddress;
         tokenContract.transfer(_actorAddress, _amount);
         return index;
+    }
+
+    function setTokenContract(address _tokenContract) public onlyOwner {
+        require(_tokenContract != address(0), "Token contract address is 0x");
+
+        tokenContract = ERC20Basic(_tokenContract);
     }
 
 }
