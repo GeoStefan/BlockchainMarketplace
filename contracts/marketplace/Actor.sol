@@ -12,6 +12,8 @@ contract Actor {
         string category;
     }
 
+    event ActorCreated(uint userId, address userAddress);
+
     User[] users;
 
     mapping(uint => address) usersToAddress;
@@ -19,7 +21,7 @@ contract Actor {
     // OPTIONAL: verify actor is not duplicated
     function _addActor(uint _charge, uint _time, ActorType _actorType, string memory _name, string memory _category) internal returns(uint) {
         User memory user = User(_charge, _time, uint8(5),_actorType, _name, _category);
-        uint index = users.push(user);
+        uint index = users.push(user) - 1;
         return index;
     }
 

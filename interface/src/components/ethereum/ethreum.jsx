@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0x3F8260B20E0Cd02a0B60aBFeFf8B3C4C0e37c1FB";
-export const tokenAddress = "0x0E2D44F1Dd38f658f36154d3955CAd8f52e8309a";
+export const marketplaceAddress = "0xfeaa12f5DEf1C6df7fc8A2174381F67d83c10F7F";
+export const tokenAddress = "0xb9BD9f75BC04B426E4746300f77074286FB5c250";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -25,21 +25,20 @@ export const getAccountAddress = async () => {
     return res[0];
 }
 
-// export const createIdentity = async (userAddress, ipfsHash, identityProviderAddress) => {
-//     let web3 = await getWeb3Instance();
-//     const contract = new web3.eth.Contract(userIdentityAbi, marketplaceAddress);
-//     let result = await contract.methods.addIdentity(ipfsHash, identityProviderAddress).send({
-//       from: userAddress
-//     });
-//     return result.transactionHash;
-//   }
-
 export const verifyAdmin = async () => {
     let address = await getAccountAddress();
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
     let admin = await contract.methods.owner().call();
-    console.log(address + " " + admin);
-    console.log(address === admin);
     return address === admin;
+}
+
+export const createActor = async (charge, time, type, name, category, amount, address) => {
+    let userAddress = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let result = await contract.methods.createActor(charge, time, type, name, category, amount, address).send({
+        from: userAddress
+    });
+    return { hash: result.transactionHash, id: result.events.ActorCreated.returnValues.userId };
 }
