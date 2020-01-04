@@ -42,20 +42,13 @@ contract Marketplace is Actor, Pausable {
 
     ERC20 tokenContract;
 
-    function createActor(uint _charge, uint _time, ActorType _actorType, string calldata _name, string calldata _category, uint _amount,
+    function createActor(uint _charge, ActorType _actorType, string calldata _name, string calldata _category, uint _amount,
      address _actorAddress) external onlyOwner {
-        uint index = _addActor(_charge, _time, _actorType, _name, _category);
+        uint index = _addActor(_charge, _actorType, _name, _category);
         usersToAddress[index] = _actorAddress;
         emit ActorCreated(index, _actorAddress);
 
         tokenContract.transferFrom(msg.sender, _actorAddress, _amount);
-    }
-
-    function getActor(uint id) external view returns(uint charge, uint time, ActorType actorType, string memory name,
-     string memory category, address actorAddress) {
-        User storage actor = users[id];
-        actorAddress = usersToAddress[id];
-        return (actor.charge, actor.time, actor.actorType, actor.name, actor.category, actorAddress);
     }
 
     function setTokenContract(address _tokenContract) public onlyOwner {

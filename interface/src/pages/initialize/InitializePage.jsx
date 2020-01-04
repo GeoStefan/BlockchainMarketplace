@@ -1,60 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { createActor, verifyAdmin } from '../../components/ethereum/ethreum';
+import { createActor, verifyAdmin, getTokensBalance } from '../../components/ethereum/ethreum';
 import './InitializePage.css';
 
-
-// class InitializePage extends React.Component {
-
-//     constructor(props) {
-//         super(props);
-
-//         this.state = {
-//             isAdmin: false,
-//             charge: "",
-//             time: "",
-//             type: "",
-//             name: "",
-//             category: "",
-//             amount: "",
-//             address: ""
-//         }
-
-//         this.handleCharge = this.handleCharge.bind(this);
-//     }
-
-//     async componentDidMount() {
-//         let isAdmin = await verifyAdmin();
-//         this.setState({ isAdmin });
-//     }
-
-//     handleCharge(event) {
-//         this.setState({ charge: event.target.value });
-//     }
-
-//     render() {
-//         console.log("Render initialize");
-//         return (
-//             <React.Fragment>
-//                 {
-//                     this.state.isAdmin ?
-//                         (
-//                             <div>
-//                                 <div>InitializePage</div>
-//                                 <label htmlFor="charge">Charge</label>
-//                                 <input type="number" id="charge" onChange={this.handleCharge}></input>
-//                             </div>
-//                         ) : <div>You have no admin rights</div>
-//                 }
-//             </React.Fragment>
-//         )
-//     }
-// }
 
 const InitializePage = (props) => {
     const userTypes = { Freeelancer: 1, Evaluator: 2 };
     const [isAdmin, setIsAdmin] = useState(false);
     const [charge, setCharge] = useState(0);
-    const [time, setTime] = useState(0);
     const [type, setType] = useState(userTypes.Freeelancer);
     const [name, setName] = useState("");
     const [category, setCategory] = useState("Math");
@@ -63,52 +15,56 @@ const InitializePage = (props) => {
     const [txHash, setTxHash] = useState("");
     const [userId, setUserId] = useState("");
     const [loading, setLoading] = useState(false);
+    const [balance, setBalance] = useState(0);
 
     useEffect(() => {
         async function fetchData() {
             let isAdmin = await verifyAdmin();
             setIsAdmin(isAdmin);
+            let b = await getTokensBalance();
+            setBalance(b);
         }
         fetchData();
+
+        window.ethereum.on('accountsChanged', function (accounts) {
+            verifyAdmin().then(admin => setIsAdmin(admin));
+        });
     }, []);
 
     const addActor = async () => {
         setLoading(true);
-        let result = await createActor(charge, time, type, name, category, amount, address);
+        let result = await createActor(charge, type, name, category, amount, address);
         setLoading(false);
         setTxHash(result.hash);
         setUserId(result.id);
     }
 
     const validateInput = () => {
-        return charge != 0 && time > 0 && name != "" && address != "";
+        return charge !== 0 && name !== "" && address !== "";
     }
 
     return (
         <React.Fragment>
             {
                 isAdmin ? (
-                    <div>
-                        <div>InitializePage</div>
-                        <div><label htmlFor="charge">Charge</label>
+                    <section className="flex-container">
+                        <h2>Create new actor</h2>
+                        <div className="item omrs-input-group">
+                            <label htmlFor="charge" className="omrs-input-label">Charge per hour</label>
                             <input type="number" id="charge" onChange={event => setCharge(event.target.value)}></input>
                         </div>
-                        <div>
-                            <label htmlFor="time">Time</label>
-                            <input type="number" id="time" onChange={event => setTime(event.target.value)}></input>
-                        </div>
-                        <div>
+                        <div className="item">
                             <label htmlFor="type">Type</label>
                             <select value={type} id="type" onChange={event => setType(event.target.value)}>
                                 <option value={userTypes.Freeelancer}>Freeelancer</option>
                                 <option value={userTypes.Evaluator}>Evaluator</option>
                             </select>
                         </div>
-                        <div>
+                        <div className="item">
                             <label htmlFor="name">Name</label>
                             <input type="text" id="name" onChange={event => setName(event.target.value)}></input>
                         </div>
-                        <div>
+                        <div className="item">
                             <label htmlFor="category">Category</label>
                             <select value={category} id="category" onChange={event => setCategory(event.target.value)}>
                                 <option value="Math">Math</option>
@@ -116,18 +72,18 @@ const InitializePage = (props) => {
                                 <option value="Legally">Legally</option>
                             </select>
                         </div>
-                        <div>
-                            <label htmlFor="amount">Amount</label>
+                        <div className="item">
+                            <label htmlFor="amount">Amount to transfer({balance} available)</label>
                             <input type="number" id="amount" onChange={event => setAmount(event.target.value)}></input>
                         </div>
-                        <div>
-                            <label htmlFor="address">Address</label>
+                        <div className="item">
+                            <label htmlFor="address">Ethereum address</label>
                             <input type="text" id="address" onChange={event => setAddress(event.target.value)}></input>
                         </div>
                         <button onClick={addActor} disabled={!validateInput()}>Create actor</button>
                         {loading ? <div id="loader"></div> : null}
                         {txHash !== "" ? (<div>Transaction hash: {txHash}<br /> User id: {userId}</div>) : null}
-                    </div>
+                    </section>
                 ) :
                     <div>You have no admin rights</div>
             }

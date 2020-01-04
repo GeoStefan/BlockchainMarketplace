@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0xfeaa12f5DEf1C6df7fc8A2174381F67d83c10F7F";
-export const tokenAddress = "0xb9BD9f75BC04B426E4746300f77074286FB5c250";
+export const marketplaceAddress = "0xe4d31CB79d5Ac29f221666a5F302bF82F3c6786c";
+export const tokenAddress = "0x0fB7396e35e2296526F72bb6Ad1Efcdb827b6b1B";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -30,15 +30,48 @@ export const verifyAdmin = async () => {
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
     let admin = await contract.methods.owner().call();
+    console.log(address, admin);
     return address === admin;
 }
 
-export const createActor = async (charge, time, type, name, category, amount, address) => {
+export const createActor = async (charge, type, name, category, amount, address) => {
+    console.log(charge, type, name, category, amount, address)
     let userAddress = await getAccountAddress();
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
-    let result = await contract.methods.createActor(charge, time, type, name, category, amount, address).send({
+    let result = await contract.methods.createActor(charge, type, name, category, amount, address).send({
         from: userAddress
     });
     return { hash: result.transactionHash, id: result.events.ActorCreated.returnValues.userId };
+}
+
+export const getTokensBalance = async () => {
+    let userAddress = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(tokenAbi, tokenAddress);
+    let result = await contract.methods.balanceOf(userAddress).call();
+    return result;
+}
+
+export const getActor = async (id) => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let result = await contract.methods.getActor(id).call();
+    return result;
+}
+
+export const getActors = async () => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    const length = await contract.methods.getActorsNumber();
+    let freelancers = [], evaluators = [];
+    for (let i = 0; i < length; i++) {
+        let actor = await getActor(i);
+        if (actor.actorType == "Freelancer") {
+            freelancers.push(actor);
+        } else {
+            evaluators.push(actor);
+        }
+    }
+    return { freelancers: freelancers, evaluators: evaluators };
 }
