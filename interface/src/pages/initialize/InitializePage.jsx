@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { createActor, verifyAdmin, getTokensBalance } from '../../components/ethereum/ethreum';
+import { createUser, createManager, verifyAdmin, getTokensBalance } from '../../components/ethereum/ethreum';
 import './InitializePage.css';
 
 
 const InitializePage = (props) => {
-    const userTypes = { Freeelancer: 1, Evaluator: 2 };
+    const userTypes = { Freeelancer: 1, Evaluator: 2, Manager: 0 };
     const [isAdmin, setIsAdmin] = useState(false);
     const [charge, setCharge] = useState(0);
     const [type, setType] = useState(userTypes.Freeelancer);
@@ -33,7 +33,11 @@ const InitializePage = (props) => {
 
     const addActor = async () => {
         setLoading(true);
-        let result = await createActor(charge, type, name, category, amount, address);
+        let result;
+        if (type == userTypes.Manager)
+            result = await createManager(name, amount, address);
+        else
+            result = await createUser(charge, type, name, category, amount, address);
         setLoading(false);
         setTxHash(result.hash);
         setUserId(result.id);
@@ -49,24 +53,25 @@ const InitializePage = (props) => {
                 isAdmin ? (
                     <section className="flex-container">
                         <h2>Create new actor</h2>
-                        <div className="item omrs-input-group">
-                            <label htmlFor="charge" className="omrs-input-label">Charge per hour</label>
-                            <input type="number" id="charge" onChange={event => setCharge(event.target.value)}></input>
-                        </div>
                         <div className="item">
                             <label htmlFor="type">Type</label>
                             <select value={type} id="type" onChange={event => setType(event.target.value)}>
                                 <option value={userTypes.Freeelancer}>Freeelancer</option>
                                 <option value={userTypes.Evaluator}>Evaluator</option>
+                                <option value={userTypes.Manager}>Manager</option>
                             </select>
                         </div>
                         <div className="item">
                             <label htmlFor="name">Name</label>
-                            <input type="text" id="name" onChange={event => setName(event.target.value)}></input>
+                            <input type="text" id="name" onChange={event => setName(event.target.value)} />
+                        </div>
+                        <div className="item omrs-input-group">
+                            <label htmlFor="charge" className="omrs-input-label">Charge per hour</label>
+                            <input type="number" id="charge" onChange={event => setCharge(parseInt(event.target.value))} disabled={type == userTypes.Manager} />
                         </div>
                         <div className="item">
                             <label htmlFor="category">Category</label>
-                            <select value={category} id="category" onChange={event => setCategory(event.target.value)}>
+                            <select value={category} id="category" onChange={event => setCategory(event.target.value)} disabled={type == userTypes.Manager}>
                                 <option value="Math">Math</option>
                                 <option value="Biology">Biology</option>
                                 <option value="Legally">Legally</option>
@@ -74,11 +79,11 @@ const InitializePage = (props) => {
                         </div>
                         <div className="item">
                             <label htmlFor="amount">Amount to transfer({balance} available)</label>
-                            <input type="number" id="amount" onChange={event => setAmount(event.target.value)}></input>
+                            <input type="number" id="amount" onChange={event => setAmount(parseInt(event.target.value))} />
                         </div>
                         <div className="item">
                             <label htmlFor="address">Ethereum address</label>
-                            <input type="text" id="address" onChange={event => setAddress(event.target.value)}></input>
+                            <input type="text" id="address" onChange={event => setAddress(event.target.value)} />
                         </div>
                         <button onClick={addActor} disabled={!validateInput()}>Create actor</button>
                         {loading ? <div id="loader"></div> : null}

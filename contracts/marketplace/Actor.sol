@@ -1,7 +1,7 @@
 pragma solidity ^0.5.8;
 
 contract Actor {
-    enum ActorType { Manager, Freelancer, Evaluator }
+    enum ActorType { Freelancer, Evaluator }
 
     struct User {
         uint charge;
@@ -11,13 +11,29 @@ contract Actor {
         string category;
     }
 
+    struct Manager {
+        uint8 reputation;
+        address managerAddress;
+        string name;
+    }
+
     event ActorCreated(uint userId, address userAddress);
+    event ManagerCreated(uint managerId, address managerAddress);
 
     User[] users;
+    Manager[] managers;
 
+    // Replace this mapping with inverse one
     mapping(uint => address) usersToAddress;
+    mapping(address => uint) addressToUser;
 
-    // OPTIONAL: verify actor is not duplicated
+    mapping(address => uint) addressToManager;
+
+    modifier onlyManager() {
+        require(_isManager(msg.sender), "Is not manager");
+        _;
+    }
+
     function _addActor(uint _charge, ActorType _actorType, string memory _name, string memory _category) internal returns(uint) {
         User memory user = User(_charge, uint8(5), _actorType, _name, _category);
         uint index = users.push(user) - 1;
@@ -33,6 +49,11 @@ contract Actor {
 
     function getActorsNumber() external view returns(uint) {
         return users.length;
+    }
+
+    function _isManager(address claimant) internal view returns (bool) {
+        uint id = addressToManager[claimant];
+        return claimant == managers[id].managerAddress;
     }
 
 }

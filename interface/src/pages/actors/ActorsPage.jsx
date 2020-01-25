@@ -19,7 +19,7 @@ const ActorsPage = (props) => {
     return (
         <div>
             <div>ActorsPage</div>
-            <div>{freelancers.map(f => <div>f.name f.actorAddress f.charge</div>)}</div>
+            <div>{freelancers.map(f => <div>{f.name} {f.actorAddress} {f.charge}</div>)}</div>
         </div>
 
     )
