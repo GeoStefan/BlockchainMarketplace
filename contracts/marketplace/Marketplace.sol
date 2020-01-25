@@ -16,7 +16,7 @@ contract Marketplace is Actor, Pausable {
         TaskStatus status;
     }
 
-    Task[] tasks;
+    Task[] public tasks;
 
     enum TaskStatus { Created, Opened, Applied, Assigned, Resolved, Accepted, Rejected, Canceled }
 
@@ -30,7 +30,7 @@ contract Marketplace is Actor, Pausable {
     event TaskCanceled(uint taskId);
     event EvaluatorAssignedToTask(uint evaluatorId, address evaluator, uint taskId);
 
-    mapping(uint => address) taskToManager;
+    mapping(uint => address) public taskToManager;
 
     mapping(uint => User) taskToFreelancer;
 
@@ -83,7 +83,7 @@ contract Marketplace is Actor, Pausable {
 
             emit TaskCreated(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description, TaskStatus.Created);
             Task memory task = Task(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description, TaskStatus.Created);
-            index = tasks.push(task);
+            index = tasks.push(task) - 1;
             taskToManager[index] = msg.sender;
     }
 
@@ -167,6 +167,6 @@ contract Marketplace is Actor, Pausable {
             require(rewardEvaluator > 0, "rewardEvaluator is invalid");
             require(timeToResolve > 0, "timeToResolve is invalid");
             require(timeToEvaluate > 0, "timeToEvaluate is invalid");
-            require(rewardFreelancer + rewardEvaluator < rewardEvaluator, "Rewards overflow");
+            require(rewardFreelancer + rewardEvaluator > rewardEvaluator, "Rewards overflow");
     }
 }

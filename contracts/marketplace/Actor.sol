@@ -21,7 +21,7 @@ contract Actor {
     event ManagerCreated(uint managerId, address managerAddress);
 
     User[] users;
-    Manager[] managers;
+    Manager[] public managers;
 
     // Replace this mapping with inverse one
     mapping(uint => address) usersToAddress;
@@ -49,6 +49,14 @@ contract Actor {
 
     function getActorsNumber() external view returns(uint) {
         return users.length;
+    }
+
+    function getManagersNumber() external view returns(uint) {
+        return managers.length;
+    }
+
+    function isManager(address claimant) external view returns (bool) {
+        return _isManager(claimant);
     }
 
     function _isManager(address claimant) internal view returns (bool) {

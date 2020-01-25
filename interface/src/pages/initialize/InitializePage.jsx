@@ -4,7 +4,7 @@ import './InitializePage.css';
 
 
 const InitializePage = (props) => {
-    const userTypes = { Freeelancer: 1, Evaluator: 2, Manager: 0 };
+    const userTypes = { Freeelancer: 0, Evaluator: 1, Manager: 2 };
     const [isAdmin, setIsAdmin] = useState(false);
     const [charge, setCharge] = useState(0);
     const [type, setType] = useState(userTypes.Freeelancer);
@@ -44,7 +44,7 @@ const InitializePage = (props) => {
     }
 
     const validateInput = () => {
-        return charge !== 0 && name !== "" && address !== "";
+        return (type == userTypes.Manager || charge !== 0) && name !== "" && address !== "";
     }
 
     return (
@@ -55,7 +55,7 @@ const InitializePage = (props) => {
                         <h2>Create new actor</h2>
                         <div className="item">
                             <label htmlFor="type">Type</label>
-                            <select value={type} id="type" onChange={event => setType(event.target.value)}>
+                            <select value={type} id="type" onChange={event => setType(parseInt(event.target.value))}>
                                 <option value={userTypes.Freeelancer}>Freeelancer</option>
                                 <option value={userTypes.Evaluator}>Evaluator</option>
                                 <option value={userTypes.Manager}>Manager</option>

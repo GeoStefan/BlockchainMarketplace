@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0x8BcE9045499AF6F44b12CcB79beeb1Fa53321019";
-export const tokenAddress = "0x76B186c02F7754939705ff352643ccBFf55540fA";
+export const marketplaceAddress = "0x189388D7B18B7cB5A7977d719E0DfcbC0D06dd07";
+export const tokenAddress = "0x70bC95373F7b68e8C10ec1BEf788116eF0EE1562";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -32,6 +32,14 @@ export const verifyAdmin = async () => {
     let admin = await contract.methods.owner().call();
     console.log(address, admin);
     return address === admin;
+}
+
+export const verifyManager = async () => {
+    let address = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let manager = await contract.methods.isManager(address).call();
+    return manager;
 }
 
 export const createUser = async (charge, type, name, category, amount, address) => {
@@ -81,11 +89,22 @@ export const getActors = async () => {
     let freelancers = [], evaluators = [];
     for (let i = 0; i < length; i++) {
         let actor = await getActor(i);
-        if (actor.actorType == "1") {
+        if (actor.actorType == "0") {
             freelancers.push(actor);
         } else {
             evaluators.push(actor);
         }
     }
     return { freelancers: freelancers, evaluators: evaluators };
+}
+
+export const createTask = async (rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description) => {
+    let userAddress = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    console.log(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description);
+    let result = await contract.methods.createTask(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description).send({
+        from: userAddress
+    });
+    return { hash: result.transactionHash, id: result.events.TaskCreated.returnValues.taskId };
 }
