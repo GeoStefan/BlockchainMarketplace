@@ -74,6 +74,49 @@ const marketplaceAbi = [
   },
   {
     "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "tasks",
+    "outputs": [
+      {
+        "name": "rewardFreelancer",
+        "type": "uint256"
+      },
+      {
+        "name": "rewardEvaluator",
+        "type": "uint256"
+      },
+      {
+        "name": "timeToResolve",
+        "type": "uint256"
+      },
+      {
+        "name": "timeToEvaluate",
+        "type": "uint256"
+      },
+      {
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -114,6 +157,25 @@ const marketplaceAbi = [
       },
       {
         "name": "actorAddress",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "taskToManager",
+    "outputs": [
+      {
+        "name": "",
         "type": "address"
       }
     ],
@@ -510,6 +572,48 @@ const marketplaceAbi = [
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "taskId",
+        "type": "uint256"
+      },
+      {
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "getUsersForCreatedTask",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "taskId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getUsersNumberForCreatedTask",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
   }
 ];

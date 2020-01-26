@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { createTask, verifyManager, getTokensBalance } from '../../components/ethereum/ethreum';
+import { approve, createTask, verifyManager, getTokensBalance } from '../../components/ethereum/ethreum';
+import './CreateTaskPage.css';
 
 const CreateTaskPage = (props) => {
     const [rewardFreelancer, setRewardFreelancer] = useState(0);
@@ -33,12 +34,22 @@ const CreateTaskPage = (props) => {
         return rewardFreelancer > 0 && rewardEvaluator && rewardEvaluator + rewardFreelancer <= balance && timeToResolve > 0 && timeToEvaluate > 0 && description != 0;
     }
 
+    const validateApprove = () => {
+        return parseInt(rewardFreelancer) > 0 && parseInt(rewardEvaluator) > 0;
+    }
+
     const addTask = async () => {
         setLoading(true);
         let result = await createTask(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description);
         setLoading(false);
         setTxHash(result.hash);
         setTaskId(result.id);
+    }
+
+    const approveAmount = async () => {
+        setLoading(true);
+        let result = await approve(parseInt(rewardFreelancer) + parseInt(rewardEvaluator));
+        setLoading(false);
     }
 
     return (
@@ -75,7 +86,9 @@ const CreateTaskPage = (props) => {
                             <label htmlFor="timeToEvaluate" className="omrs-input-label">Time to evaluate</label>
                             <input type="number" id="timeToEvaluate" onChange={event => setTimeToEvaluate(parseInt(event.target.value))} />
                         </div>
-
+                        <div>Before creating a new task you need to approve contract to transfer your funds</div>
+                        <div>Amount = {rewardFreelancer + rewardEvaluator}</div>
+                        <button onClick={approveAmount} disabled={!validateApprove()}>Approve</button>
                         <button onClick={addTask} disabled={!validateInput()}>Create task</button>
                         {loading ? <div id="loader"></div> : null}
                         {txHash !== "" ? (<div>Transaction hash: {txHash}<br /> User id: {taskId}</div>) : null}

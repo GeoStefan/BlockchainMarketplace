@@ -64,4 +64,29 @@ contract("Marketplace", function (accounts) {
         assert.equal(task.status.toNumber(), 0, "Status wasn't correct");
         assert.equal(manager, accounts[9], "Manager of task wasn't correct");
     })
+
+    it("adds evaluator for task correctly", async () => {
+        const taskId = 0, userId = 0;
+
+        let result = await this.marketplace.addEvaluatorForTask(taskId, userId, { from: accounts[9] });
+        let usersForTask = await this.marketplace.getUsersNumberForCreatedTask(taskId);
+        let id = await this.marketplace.getUsersForCreatedTask(taskId, 0);
+
+        assert.equal(usersForTask.toNumber(), 1, "Number of users for task wasn't correct");
+        assert.equal(id.toNumber(), userId, "User id for task wasn't correct");
+    })
+
+    it("modifies task correctly", async () => {
+        const taskId = 0, rewardFreelancer = 3, rewardEvaluator = 1, timeToResolve = 30, timeToEvaluate =7, domain = "Math", description = "Arie triunghi isoscel";
+
+        let result = await this.marketplace.modifyTask(taskId, rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description, { from: accounts[9] });
+        let task = await this.marketplace.tasks(0);
+        assert.equal(task.rewardFreelancer, rewardFreelancer, "Reward freelancer wasn't correct");
+        assert.equal(task.rewardEvaluator, rewardEvaluator, "Reward evaluator wasn't correct");
+        assert.equal(task.timeToResolve, timeToResolve, "timeToResolve wasn't correct");
+        assert.equal(task.timeToEvaluate, timeToEvaluate, "timeToEvaluate wasn't correct");
+        assert.equal(task.domain, domain, "domain wasn't correct");
+        assert.equal(task.description, description, "description wasn't correct");
+        assert.equal(task.status.toNumber(), 0, "Status wasn't correct");
+    })
 })

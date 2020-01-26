@@ -169,4 +169,12 @@ contract Marketplace is Actor, Pausable {
             require(timeToEvaluate > 0, "timeToEvaluate is invalid");
             require(rewardFreelancer + rewardEvaluator > rewardEvaluator, "Rewards overflow");
     }
+
+    function getUsersForCreatedTask(uint taskId, uint index) external view returns (uint) {
+        return taskToUsers[taskId][index];
+    }
+
+    function getUsersNumberForCreatedTask(uint taskId) external view returns (uint) {
+        return taskToUsers[taskId].length;
+    }
 }
