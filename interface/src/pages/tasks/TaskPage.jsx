@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getTask, createTask } from '../../components/ethereum/ethreum';
+import { getTask, createTask, getTasksNumber } from '../../components/ethereum/ethreum';
 
 
 const TaskPage = (props) => {
@@ -12,6 +12,8 @@ const TaskPage = (props) => {
             t.status = mapTaskStatus(t.status);
             setTask(t);
             console.log(t);
+            let n = await getTasksNumber();
+            console.log(n);
         }
         fetchData();
     }, []);

@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0xe54aa9D40DbEBc93aa0DaAd955333C31d3133Be3";
-export const tokenAddress = "0xD79f0289b3fa0b55e4D9D61C25a74a5F2945fA00";
+export const marketplaceAddress = "0x7957D8146165c89B4Eb4c6C6f4a45a0A06B6da49";
+export const tokenAddress = "0x7Ca1ef0974afBbe02c36173bfcEC86bDa5743Bba";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -123,5 +123,12 @@ export const getTask = async (taskId) => {
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
     let result = await contract.methods.tasks(taskId).call();
+    return result;
+}
+
+export const getTasksNumber = async () => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let result = await contract.methods.getTasksNumber().call();
     return result;
 }

@@ -1,4 +1,4 @@
-const marketplaceAbi = [
+const marketplaceAbi =[
   {
     "constant": true,
     "inputs": [],
@@ -614,6 +614,20 @@ const marketplaceAbi = [
     ],
     "payable": false,
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "getTasksNumber",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ];

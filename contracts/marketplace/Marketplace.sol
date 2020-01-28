@@ -177,4 +177,8 @@ contract Marketplace is Actor, Pausable {
     function getUsersNumberForCreatedTask(uint taskId) external view returns (uint) {
         return taskToUsers[taskId].length;
     }
+
+    function getTasksNumber() external returns (uint) {
+        return tasks.length;
+    }
 }
