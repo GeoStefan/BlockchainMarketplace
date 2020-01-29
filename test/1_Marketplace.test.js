@@ -14,8 +14,8 @@ contract("Marketplace", function (accounts) {
         let owner = await this.marketplace.owner();
 
         assert.equal(owner, accounts[0], "Owner is not correct");
-        assert.equal(supply, 1000, "Total supply wasn't correct");
-        assert.equal(ownerBalance, 1000, "Owner balance wasn't correct");
+        assert.equal(supply.toNumber(), 1000, "Total supply wasn't correct");
+        assert.equal(ownerBalance.toNumber(), 1000, "Owner balance wasn't correct");
         assert.equal(tokensAllowedToTransfer, 1000, "Marketplace is not allowed to transfer owner tokens");
     })
 
@@ -88,5 +88,10 @@ contract("Marketplace", function (accounts) {
         assert.equal(task.domain, domain, "domain wasn't correct");
         assert.equal(task.description, description, "description wasn't correct");
         assert.equal(task.status.toNumber(), 0, "Status wasn't correct");
+    })
+
+    it("cancel tasks", async () => {
+        let result = await this.marketplace.cancelTask(taskId, {from: accounts[9]});
+
     })
 })

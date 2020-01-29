@@ -148,7 +148,7 @@ contract Marketplace is Actor, Pausable {
         require(_isEvaluatorForTask(msg.sender, taskId), "Sender is not evaluator for task");
         require(tasks[taskId].status == TaskStatus.Created, "Task status is not 'created'");
 
-        tasks[taskId].status == TaskStatus.Opened;
+        tasks[taskId].status = TaskStatus.Opened;
         taskToEvaluator[taskId] = addressToUser[msg.sender];
         evaluatorTasks[msg.sender].push(taskId);
     }

@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0x59c2CC49424f4A5b0eDf4104b7353AFfA2837d57";
-export const tokenAddress = "0x770477DfD219629dBd2fd323636be7a5d9Cc8449";
+export const marketplaceAddress = "0xcf84dBc04480Aba4478D20AC5522Cb115a80F544";
+export const tokenAddress = "0xc20C94c0A70FA8CCD39de7A3A36ec1B72bf96d94";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -89,6 +89,8 @@ export const getActors = async () => {
     let freelancers = [], evaluators = [];
     for (let i = 0; i < length; i++) {
         let actor = await getActor(i);
+        actor.id = i;
+        console.log(actor);
         if (actor.actorType == "0") {
             freelancers.push(actor);
         } else {
@@ -155,6 +157,7 @@ export const getTasksNumber = async () => {
 }
 
 export const addEvaluatorForTask = async (taskId, evaluatorId) => {
+    console.log(taskId, evaluatorId);
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
     let userAddress = await getAccountAddress();
@@ -170,4 +173,19 @@ export const acceptTaskToEvaluate = async (taskId) => {
     await contract.methods.acceptTaskToEvaluate(taskId).send({
         from: userAddress
     });
+}
+
+export const getUsersForTask = async (taskId) => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let freelancers = [], evaluators = [];
+    let length = await contract.methods.getUsersNumberForCreatedTask(taskId).call();
+    for (let i = 0; i < length; i++) {
+        let userId = await contract.methods.getUsersForCreatedTask(taskId, i);
+        let user = await getActor(userId);
+        if (user.actorType == "0")
+            freelancers.push(user);
+        else evaluators.push(user);
+    }
+    return { freelancers: freelancers, evaluators: evaluators };
 }

@@ -1,4 +1,4 @@
-const marketplaceAbi =[
+const marketplaceAbi = [
   {
     "constant": true,
     "inputs": [],

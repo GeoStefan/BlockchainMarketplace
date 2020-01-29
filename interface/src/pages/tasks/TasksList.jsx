@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import Popup from "reactjs-popup";
-import { approve, getTask, modifyTask, cancelTask, getTasksNumber } from '../../components/ethereum/ethreum';
+import { approve, getTask, modifyTask, cancelTask, getTasksNumber, addEvaluatorForTask, getActors, acceptTaskToEvaluate } from '../../components/ethereum/ethreum';
 import Modal from 'react-modal';
 import '../tasks/tasks.css';
 
 const customStyles = {
-  content : {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)'
-  }
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
+    }
 };
 
 class TasksList extends React.Component {
@@ -31,6 +31,8 @@ class TasksList extends React.Component {
             timeToEvaluate: '',
             loading: false,
             taskId: 0,
+            evaluatorId: 0,
+            evaluators: [],
         }
 
         this.getStatus = this.getStatus.bind(this);
@@ -44,12 +46,19 @@ class TasksList extends React.Component {
         this.approveAmount = this.approveAmount.bind(this);
         this.modifyTask = this.modifyTask.bind(this);
         this.cancelTask = this.cancelTask.bind(this);
+        this.setEvaluator = this.setEvaluator.bind(this);
+        this.addEvaluator = this.addEvaluator.bind(this);
+        this.acceptTask = this.acceptTask.bind(this);
     }
 
     setTaskArray(currentComponent, array) {
         currentComponent.setState({
-                taskArray: array,
-            })
+            taskArray: array,
+        })
+    }
+
+    async acceptTask(taskId) {
+        let n = await acceptTaskToEvaluate(taskId);
     }
 
     async fetchData() {
@@ -63,6 +72,14 @@ class TasksList extends React.Component {
             taskArray: array,
         })
     }
+    
+    async openModal(taskId) {
+        let n = await getActors();
+        this.setState({
+            modalIsOpen: true,
+            evaluators: n.evaluators,
+        });
+    }
 
     componentDidMount() {
         this.fetchData();
@@ -72,31 +89,27 @@ class TasksList extends React.Component {
         if (status === '0') {
             return 'Created';
         } else if (status === '1') {
-            return 'Edited';
+            return 'Opened';
         }
         return 'Canceled';
     }
-    
-    openModal() {
-        this.setState({modalIsOpen: true});
-    }
-    
+
     afterOpenModal() {
         // references are now sync'd and can be accessed.
         this.subtitle.style.color = '#f00';
     }
-    
+
     closeModal() {
-        this.setState({modalIsOpen: false});
+        this.setState({ modalIsOpen: false });
     }
 
 
     validateInput() {
-        return this.state.rewardFreelancer > 0 && 
-            this.state.rewardEvaluator && 
-            this.state.rewardEvaluator + this.state.rewardFreelancer <= this.state.balance && 
+        return this.state.rewardFreelancer > 0 &&
+            this.state.rewardEvaluator &&
+            this.state.rewardEvaluator + this.state.rewardFreelancer <= this.state.balance &&
             this.state.timeToResolve > 0 &&
-            this.state.timeToEvaluate > 0 && 
+            this.state.timeToEvaluate > 0 &&
             this.state.description != 0;
     }
 
@@ -110,14 +123,14 @@ class TasksList extends React.Component {
             loading: true,
         })
         let result = await modifyTask(
-            currentTaskId, 
-            this.state.rewardFreelancer, 
-            this.state.rewardEvaluator, 
-            this.state.timeToResolve, 
-            this.state.timeToEvaluate, 
-            this.state.domain, 
+            currentTaskId,
+            this.state.rewardFreelancer,
+            this.state.rewardEvaluator,
+            this.state.timeToResolve,
+            this.state.timeToEvaluate,
+            this.state.domain,
             this.state.description
-            );
+        );
         this.setState({
             loading: false,
             txHash: result.hash,
@@ -132,6 +145,17 @@ class TasksList extends React.Component {
         this.setState({
             loading: false,
             txHash: result.hash,
+        })
+    }
+
+    async addEvaluator(taskId) {
+        let result = await addEvaluatorForTask(taskId, this.state.evaluatorId);
+    }
+
+    setEvaluator(evaluatorId) {
+        console.log("Evaluator:", evaluatorId);
+        this.setState({
+            evaluatorId: evaluatorId,
         })
     }
 
@@ -150,7 +174,7 @@ class TasksList extends React.Component {
         return (
             <React.Fragment>
                 <p>Below is a list of all of the available tasks:</p>
-                {this.state.taskArray !== [] && this.state.taskArray.map(task => 
+                {this.state.taskArray !== [] && this.state.taskArray.map(task =>
                     <div className="tasks">
                         <div className="evaluators">
                             <p className="section__eval--dark">Domain: {task.domain}</p>
@@ -161,7 +185,8 @@ class TasksList extends React.Component {
                             <p className="section__eval">{task.description}</p>
                             <p className="section__eval--dark">Status is: {this.getStatus(task.status)}</p>
                             <p className="section__eval">
-                                <button onClick={this.openModal}>Edit Task</button>
+                                <button onClick={() => this.openModal(this.state.taskArray.indexOf(task))}>Edit Task</button>
+                                <button onClick={() => this.cancelTask(this.state.taskArray.indexOf(task))}>Cancel task</button>
                                 <Modal
                                     isOpen={this.state.modalIsOpen}
                                     // onAfterOpen={this.afterOpenModal}
@@ -171,44 +196,54 @@ class TasksList extends React.Component {
                                 >
                                     <div className="flexer">
                                         <main>
-                                        <section className="flex-container">
-                                            <div className="item">
-                                                <label htmlFor="category">Domain</label>
-                                                <select value={this.state.domain} id="category" onChange={event => this.setState({domain: event.target.value})}>
-                                                    <option value="Math">Math</option>
-                                                    <option value="Biology">Biology</option>
-                                                    <option value="Legally">Legally</option>
-                                                </select>
-                                            </div>
-                                            <div className="item">
-                                                <label htmlFor="name">Description</label>
-                                                <input type="text" id="name" onChange={event => this.setState({description: event.target.value})} />
-                                            </div>
-                                            <div className="item omrs-input-group">
-                                                <label htmlFor="rewardFreelancer" className="omrs-input-label">Reward Freelancer</label>
-                                                <input type="number" id="rewardFreelancer" onChange={event => this.setState({rewardFreelancer: parseInt(event.target.value)})} />
-                                            </div>
-                                            <div className="item omrs-input-group">
-                                                <label htmlFor="rewardEvaluator" className="omrs-input-label">Reward Evaluator</label>
-                                                <input type="number" id="rewardEvaluator" onChange={event => this.setState({rewardEvaluator: parseInt(event.target.value)})} />
-                                            </div>
-                                            <div className="item omrs-input-group">
-                                                <label htmlFor="timeToResolve" className="omrs-input-label">Time to resolve</label>
-                                                <input type="number" id="timeToResolve" onChange={event => this.setState({timeToResolve: parseInt(event.target.value)})} />
-                                            </div>
-                                            <div className="item omrs-input-group">
-                                                <label htmlFor="timeToEvaluate" className="omrs-input-label">Time to evaluate</label>
-                                                <input type="number" id="timeToEvaluate" onChange={event => this.setState({timeToEvaluate: parseInt(event.target.value)})} />
-                                            </div>
-                                            <div>Before creating a new task you need to approve contract to transfer your funds</div>
-                                            <div>Amount = {this.state.rewardFreelancer + this.state.rewardEvaluator}</div>
-                                            <button onClick={this.approveAmount} disabled={!this.validateApprove()}>Approve</button>
-                                            <button onClick={() => this.modifyTask(this.state.taskArray.indexOf(task))}>Modify task</button>
-                                            <button onClick={() => this.cancelTask(this.state.taskArray.indexOf(task))}>Cancel task</button>
-                                            {this.state.loading ? <div id="loader"></div> : null}
-                                            {this.state.txHash !== "" ? (<div>Transaction hash: {this.state.txHash}<br /> User id: {this.state.taskId}</div>) : null}
-                                        </section>
-                                    </main>
+                                            <section className="flex-container">
+                                                <div className="item">
+                                                    <label htmlFor="category">Domain</label>
+                                                    <select value={this.state.domain} id="category" onChange={event => this.setState({ domain: event.target.value })}>
+                                                        <option value="Math">Math</option>
+                                                        <option value="Biology">Biology</option>
+                                                        <option value="Legally">Legally</option>
+                                                    </select>
+                                                </div>
+                                                <div className="item">
+                                                    <label htmlFor="name">Description</label>
+                                                    <input type="text" id="name" onChange={event => this.setState({ description: event.target.value })} />
+                                                </div>
+                                                <div className="item omrs-input-group">
+                                                    <label htmlFor="rewardFreelancer" className="omrs-input-label">Reward Freelancer</label>
+                                                    <input type="number" id="rewardFreelancer" onChange={event => this.setState({ rewardFreelancer: parseInt(event.target.value) })} />
+                                                </div>
+                                                <div className="item omrs-input-group">
+                                                    <label htmlFor="rewardEvaluator" className="omrs-input-label">Reward Evaluator</label>
+                                                    <input type="number" id="rewardEvaluator" onChange={event => this.setState({ rewardEvaluator: parseInt(event.target.value) })} />
+                                                </div>
+                                                <div className="item omrs-input-group">
+                                                    <label htmlFor="timeToResolve" className="omrs-input-label">Time to resolve</label>
+                                                    <input type="number" id="timeToResolve" onChange={event => this.setState({ timeToResolve: parseInt(event.target.value) })} />
+                                                </div>
+                                                <div className="item omrs-input-group">
+                                                    <label htmlFor="timeToEvaluate" className="omrs-input-label">Time to evaluate</label>
+                                                    <input type="number" id="timeToEvaluate" onChange={event => this.setState({ timeToEvaluate: parseInt(event.target.value) })} />
+                                                </div>
+
+
+                                                <div className="item">
+                                                    <label htmlFor="evaluators">Select evaluator</label>
+                                                    <select value={this.state.evaluatorId} id="evaluators" onChange={event => this.setEvaluator(event.target.value)}>
+                                                        {this.state.evaluators != undefined && this.state.evaluators.map(e => <option value={e.id}>{e.name}</option>)}
+                                                    </select>
+                                                </div>
+                                                <button onClick={() => this.addEvaluator(this.state.taskArray.indexOf(task))}>Add evaluator to task</button>
+
+                                                <div>Before creating a new task you need to approve contract to transfer your funds</div>
+                                                <div>Amount = {this.state.rewardFreelancer + this.state.rewardEvaluator}</div>
+                                                <button onClick={this.approveAmount} disabled={!this.validateApprove()}>Approve</button>
+                                                <button onClick={() => this.acceptTask(this.state.taskArray.indexOf(task))} >Accept task</button>
+                                                <button onClick={() => this.modifyTask(this.state.taskArray.indexOf(task))}>Modify task</button>
+                                                {this.state.loading ? <div id="loader"></div> : null}
+                                                {this.state.txHash !== "" ? (<div>Transaction hash: {this.state.txHash}<br /> User id: {this.state.taskId}</div>) : null}
+                                            </section>
+                                        </main>
                                     </div>
                                 </Modal>
                             </p>
