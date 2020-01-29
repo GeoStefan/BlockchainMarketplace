@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0x7957D8146165c89B4Eb4c6C6f4a45a0A06B6da49";
-export const tokenAddress = "0x7Ca1ef0974afBbe02c36173bfcEC86bDa5743Bba";
+export const marketplaceAddress = "0xCdB880955D5a845cF9a17e617f94b0C6Fd0E1A62";
+export const tokenAddress = "0xD19864980DD60Eff9505273Cf65B1ce83E455d2B";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -106,6 +106,17 @@ export const createTask = async (rewardFreelancer, rewardEvaluator, timeToResolv
     let result = await contract.methods.createTask(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description).send({
         from: userAddress
     });
+    return { hash: result.transactionHash, id: result.events.TaskCreated.returnValues.taskId };
+}
+
+export const modifyTask = async (taskId, rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description) => {
+    let userAddress = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    console.log(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description);
+    let result = await contract.methods.modifyTask(taskId, rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description).send({
+            from: userAddress
+        });
     return { hash: result.transactionHash, id: result.events.TaskCreated.returnValues.taskId };
 }
 
