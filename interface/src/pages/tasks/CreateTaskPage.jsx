@@ -55,7 +55,8 @@ const CreateTaskPage = (props) => {
     return (
         <React.Fragment>
             {isManager ?
-                <main>
+                <div className="flexer">
+                    <main>
                     <section className="flex-container">
                         <h2>Create new task (balance: {balance})</h2>
                         <div className="item">
@@ -93,7 +94,8 @@ const CreateTaskPage = (props) => {
                         {loading ? <div id="loader"></div> : null}
                         {txHash !== "" ? (<div>Transaction hash: {txHash}<br /> User id: {taskId}</div>) : null}
                     </section>
-                </main> : <div>You are not a manager</div>
+                </main>
+                </div>  : <div>You are not a manager</div>
             }
         </React.Fragment>
     )

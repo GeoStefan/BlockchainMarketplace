@@ -32,6 +32,11 @@ const Navigation = () => {
                     Create Task
                      </NavLink>
             </li>
+            <li>
+                <NavLink to="/marketplace/tasks/taskList" activeClassName="active">
+                    Tasks List
+                     </NavLink>
+            </li>
             {isAdmin ? (<li>
                 <NavLink to="/marketplace/initialize" activeClassName="active">
                     Initialize

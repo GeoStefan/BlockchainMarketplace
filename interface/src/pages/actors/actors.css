@@ -1,0 +1,56 @@
+.actors__list {
+    display: flex;
+    flex-direction: column;
+}
+
+.freelancers__list {
+    display: flex;
+}
+
+.title {
+    color: white;
+    padding: 10px;
+}
+
+.freelancers, .evaluators {
+    min-width: 200px;
+    max-width: 430px;
+    min-height: 100px;
+    font-size: 17px;
+    font-family: Roboto, sans-serif;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.freelancers {
+    background-color: #F2C029;
+    color: #000;
+}
+
+.section__dark {
+    background-color: #F2AC29;
+}
+
+.section__eval--dark {
+    background-color: #8C3030;
+}
+
+.section__eval--dark:first-child {
+    border-radius: 13px 13px 0 0;
+}
+
+
+.section__dark:first-child {
+    border-radius: 13px 13px 0 0;
+}
+
+.freelancers > p,
+.evaluators > p {
+    padding: 15px;
+    margin: 0;
+}
+
+.evaluators {
+    background-color: #BF4141;
+    color: #fff;
+}

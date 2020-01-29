@@ -1,0 +1,7 @@
+.evaluators:last-child {
+    border-radius: 15px 15px 15px 15px;
+}
+
+.section__eval--dark:last-child {
+    border-radius: 0px 0px 15px 15px;
+}
