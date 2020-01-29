@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0x7957D8146165c89B4Eb4c6C6f4a45a0A06B6da49";
-export const tokenAddress = "0x7Ca1ef0974afBbe02c36173bfcEC86bDa5743Bba";
+export const marketplaceAddress = "0x59c2CC49424f4A5b0eDf4104b7353AFfA2837d57";
+export const tokenAddress = "0x770477DfD219629dBd2fd323636be7a5d9Cc8449";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
