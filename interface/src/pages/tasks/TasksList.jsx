@@ -109,7 +109,7 @@ class TasksList extends React.Component {
             loading: true,
         })
         let result = await modifyTask(
-            0, 
+            currentTaskId, 
             this.state.rewardFreelancer, 
             this.state.rewardEvaluator, 
             this.state.timeToResolve, 
