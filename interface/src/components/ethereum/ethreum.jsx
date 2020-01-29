@@ -2,8 +2,8 @@ import Web3 from 'web3';
 import marketplaceAbi from './marketplace';
 import tokenAbi from './token';
 
-export const marketplaceAddress = "0xCdB880955D5a845cF9a17e617f94b0C6Fd0E1A62";
-export const tokenAddress = "0xD19864980DD60Eff9505273Cf65B1ce83E455d2B";
+export const marketplaceAddress = "0x59c2CC49424f4A5b0eDf4104b7353AFfA2837d57";
+export const tokenAddress = "0x770477DfD219629dBd2fd323636be7a5d9Cc8449";
 
 export const getWeb3Instance = async () => {
     let web3Provider;
@@ -113,11 +113,11 @@ export const modifyTask = async (taskId, rewardFreelancer, rewardEvaluator, time
     let userAddress = await getAccountAddress();
     let web3 = await getWeb3Instance();
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
-    console.log(rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description);
+    console.log(taskId, rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description);
     let result = await contract.methods.modifyTask(taskId, rewardFreelancer, rewardEvaluator, timeToResolve, timeToEvaluate, domain, description).send({
             from: userAddress
         });
-    return { hash: result.transactionHash, id: result.events.TaskCreated.returnValues.taskId };
+    return { hash: result.transactionHash };
 }
 
 export const approve = async (value) => {
@@ -142,4 +142,22 @@ export const getTasksNumber = async () => {
     const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
     let result = await contract.methods.getTasksNumber().call();
     return result;
+}
+
+export const addEvaluatorForTask = async (taskId, evaluatorId) => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let userAddress = await getAccountAddress();
+    await contract.methods.addEvaluatorForTask(taskId, evaluatorId).send({
+        from: userAddress
+    });
+}
+
+export const acceptTaskToEvaluate = async (taskId) => {
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let userAddress = await getAccountAddress();
+    await contract.methods.acceptTaskToEvaluate(taskId).send({
+        from: userAddress
+    });
 }

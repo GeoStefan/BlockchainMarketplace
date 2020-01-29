@@ -119,6 +119,7 @@ contract Marketplace is Actor, Pausable {
         require(taskId < tasks.length, "Invalid task id");
         require(evaluatorId < users.length, "Invalid user id");
         require(taskToManager[taskId] == msg.sender, "Sender is not the manager of task");
+        require(tasks[taskId].status == TaskStatus.Created, "Task status is not created");
         User memory user = users[evaluatorId];
         require(user.actorType == ActorType.Evaluator, "User is not an evaluator");
 
@@ -154,7 +155,7 @@ contract Marketplace is Actor, Pausable {
 
     function _isEvaluatorForTask(address claimant, uint taskId) internal view returns (bool) {
         for(uint i = 0; i < taskToUsers[taskId].length; i++) {
-            if(taskToUsers[taskId][i] == addressToUser[claimant]) {
+            if(usersToAddress[taskToUsers[taskId][i]] == claimant) {
                 return true;
             }
         }

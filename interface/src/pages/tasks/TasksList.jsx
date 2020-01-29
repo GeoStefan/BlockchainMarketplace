@@ -120,7 +120,6 @@ class TasksList extends React.Component {
         this.setState({
             loading: false,
             txHash: result.hash,
-            taskId: result.id,
         })
     }
 
