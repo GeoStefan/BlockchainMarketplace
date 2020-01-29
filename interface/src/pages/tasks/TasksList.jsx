@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Popup from "reactjs-popup";
-import { approve, getTask, modifyTask, getTasksNumber } from '../../components/ethereum/ethreum';
+import { approve, getTask, modifyTask, cancelTask, getTasksNumber } from '../../components/ethereum/ethreum';
 import Modal from 'react-modal';
 import '../tasks/tasks.css';
 
@@ -43,6 +43,7 @@ class TasksList extends React.Component {
         this.fetchData = this.fetchData.bind(this);
         this.approveAmount = this.approveAmount.bind(this);
         this.modifyTask = this.modifyTask.bind(this);
+        this.cancelTask = this.cancelTask.bind(this);
     }
 
     setTaskArray(currentComponent, array) {
@@ -123,6 +124,17 @@ class TasksList extends React.Component {
         })
     }
 
+    async cancelTask(currentTaskId) {
+        this.setState({
+            loading: true,
+        })
+        let result = await cancelTask(currentTaskId);
+        this.setState({
+            loading: false,
+            txHash: result.hash,
+        })
+    }
+
     async approveAmount() {
         this.setState({
             loading: true,
@@ -192,6 +204,7 @@ class TasksList extends React.Component {
                                             <div>Amount = {this.state.rewardFreelancer + this.state.rewardEvaluator}</div>
                                             <button onClick={this.approveAmount} disabled={!this.validateApprove()}>Approve</button>
                                             <button onClick={() => this.modifyTask(this.state.taskArray.indexOf(task))}>Modify task</button>
+                                            <button onClick={() => this.cancelTask(this.state.taskArray.indexOf(task))}>Cancel task</button>
                                             {this.state.loading ? <div id="loader"></div> : null}
                                             {this.state.txHash !== "" ? (<div>Transaction hash: {this.state.txHash}<br /> User id: {this.state.taskId}</div>) : null}
                                         </section>

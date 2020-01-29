@@ -120,6 +120,16 @@ export const modifyTask = async (taskId, rewardFreelancer, rewardEvaluator, time
     return { hash: result.transactionHash };
 }
 
+export const cancelTask = async (taskId) => {
+    let userAddress = await getAccountAddress();
+    let web3 = await getWeb3Instance();
+    const contract = new web3.eth.Contract(marketplaceAbi, marketplaceAddress);
+    let result = await contract.methods.cancelTask(taskId).send({
+            from: userAddress
+        });
+    return { hash: result.transactionHash };
+}
+
 export const approve = async (value) => {
     let userAddress = await getAccountAddress();
     let web3 = await getWeb3Instance();
